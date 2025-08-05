@@ -42,7 +42,7 @@ const EditExpenseModal = ({onClose, onUpdateExpense, expense})=> {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
+            placeholder="title"
             style={styles.input}
           />
           <input

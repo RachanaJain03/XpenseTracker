@@ -41,12 +41,14 @@ const AddExpenseModal = ({ onClose, onAddExpense, walletBalance}) => {
                 <h3>Add Expenses</h3>
                 <form onSubmit={handleSubmit}>
                     <input
-                      placeholder="Title"
+                       name="title"
+                      placeholder="title"
                       value={title}
                       onChange={(e)=> setTitle(e.target.value)}
                       style={styles.input}
                       />
                       <input
+                        name="amount"
                         placeholder="Amount"
                         type="number"
                         value={amount}
