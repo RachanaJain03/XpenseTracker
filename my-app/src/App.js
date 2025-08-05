@@ -1,0 +1,158 @@
+
+import { useEffect, useState } from "react";
+import AddExpenseModal from "./components/AddExpenseModal";
+import WalletCard from "./components/wallet";
+import DashboardCard from "./components/Dashboard";
+import Header from "./components/Header";
+import EditExpenseModal from "./components/EditExpenseModal";
+import ExpenseSummary from "./components/ExpenseSummary";
+
+
+function App(){
+
+  const [expenses, setExpenses] = useState([])
+  const [walletBalance, setWalletBalance] = useState(5000)
+  const [showModal, setShowModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [expenseToEdit, setExpenseToEdit] = useState(null)
+
+  useEffect(()=>{
+    const storedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    const storedBalance = parseFloat(localStorage.getItem("walletBalance"))
+
+    setExpenses(storedExpenses);
+    if(!isNaN(storedBalance)){
+      setWalletBalance(storedBalance)
+    }
+  },[])
+
+  useEffect(() => {
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+    localStorage.setItem("walletBalance", walletBalance)
+  },[expenses, walletBalance])
+
+  const handleAddIncome = () => {
+    const amount = parseFloat(prompt("Enter amount to add"));
+    if (isNaN(amount) || amount <= 0) {
+      alert("Enter a valid amount");
+      return;
+    }
+    setWalletBalance(prev => prev + amount);
+  };
+
+  const handleAddExpense = (expenseData)=>{
+    setExpenses((prev) => [...prev, expenseData]);
+    setWalletBalance((prev) => prev - expenseData.amount)
+  }
+  const handleUpdateExpense = (updatedExpense) => {
+  setExpenses(prev => prev.map(exp => exp.id === updatedExpense.id ? updatedExpense : exp));
+
+  const oldExpense = expenses.find(e => e.id === updatedExpense.id);
+  const amountDiff = updatedExpense.amount - oldExpense.amount;
+
+  setWalletBalance(prev => prev - amountDiff);
+};
+
+  const handleAddDelete = (id)=> {
+    const expenseToDelete = expenses.find(exp => exp.id === id);
+
+    if(!expenseToDelete) return;
+
+    setExpenses(prev => prev.filter(exp => exp.id !== id))
+    setWalletBalance(prev => prev + expenseToDelete.amount)
+  }
+  
+
+
+
+  return (
+    <div className="app-container">
+      <Header />
+
+      <div className="dashboard-row">
+        <DashboardCard
+          label="Wallet Balance"
+          amount={walletBalance}
+          buttonLabel="+ Add Income"
+          onClick={handleAddIncome}
+          color="limegreen"
+        />
+        <DashboardCard
+          label="Expenses"
+          amount={expenses.reduce((sum, exp) => sum + exp.amount, 0)}
+          buttonLabel="+ Add Expense"
+          onClick={() => setShowModal(true)}
+          color="red"
+        />
+      </div>
+
+      {showModal && (
+        <AddExpenseModal
+          walletBalance={walletBalance}
+          onAddExpense={handleAddExpense}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+      <ul>
+  {expenses.length === 0 ? (
+    <li style={{ color: "#ccc" }}>No Transactions!</li>
+  ) : (
+    expenses.map((exp) => (
+      <li key={exp.id}>
+        {exp.title} - ₹{exp.amount} ({exp.category}, {exp.date})
+        <button
+          onClick={() => handleAddDelete(exp.id)}
+          style={styles.deleteBtn}
+        >
+          Delete
+        </button>
+        <button
+          onClick={() => {
+            setExpenseToEdit(exp);
+            setShowEditModal(true);
+          }}
+          style={styles.editBtn}
+        >
+          Edit
+        </button>
+      </li>
+    ))
+  )}
+</ul>
+<div style={{ display: "flex", background: "#3b3b3b", borderRadius: "10px", marginTop: "30px"}}>
+  <ExpenseSummary expenses={expenses}/>
+</div>
+
+{showEditModal && (
+  <EditExpenseModal
+    expense={expenseToEdit}
+    onClose={() => setShowEditModal(false)}
+    onUpdateExpense={handleUpdateExpense}
+    
+  />
+)}
+    
+    </div>
+  );
+}
+const styles = {
+  deleteBtn: {
+    marginLeft: "10px",
+    backgroundColor: "crimson",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    padding: "4px 8px",
+    cursor: "pointer",
+  },
+  editBtn: {
+    marginLeft: "10px",
+    backgroundColor: "teal",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    padding: "4px 8px",
+    cursor: "pointer",
+  },
+};
+export default App;
