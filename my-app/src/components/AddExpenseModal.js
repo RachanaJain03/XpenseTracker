@@ -56,6 +56,7 @@ const AddExpenseModal = ({ onClose, onAddExpense, walletBalance}) => {
                         style={styles.input}
                         />
                         <select
+                          name="category"
                           value={category}
                           onChange={(e)=> setCategory(e.target.value)}
                           style={styles.input}
@@ -67,6 +68,7 @@ const AddExpenseModal = ({ onClose, onAddExpense, walletBalance}) => {
                           </select>
                           <input
                             type="date"
+                            name="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
                             />
