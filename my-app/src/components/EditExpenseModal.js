@@ -53,6 +53,7 @@ const EditExpenseModal = ({onClose, onUpdateExpense, expense})=> {
             style={styles.input}
           />
           <select
+            name="category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             style={styles.input}
