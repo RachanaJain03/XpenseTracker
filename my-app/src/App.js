@@ -97,32 +97,52 @@ function App(){
           onClose={()=> setShowIncomeModal(false)}
           />
       )}
-      <ul>
-  {expenses.length === 0 ? (
-    <li style={{ color: "#ccc" }}>No Transactions!</li>
-  ) : (
-    expenses.map((exp) => (
-      <li key={exp.id}>
-        {exp.title} - ₹{exp.amount} ({exp.category}, {exp.date})
-        <button
-          onClick={() => handleAddDelete(exp.id)}
-          style={styles.deleteBtn}
-        >
-          Delete
-        </button>
-        <button
-          onClick={() => {
-            setExpenseToEdit(exp);
-            setShowEditModal(true);
-          }}
-          style={styles.editBtn}
-        >
-          Edit
-        </button>
-      </li>
-    ))
-  )}
-</ul>
+      <div style={styles.sectionWrapper}>
+  {/* Recent Transactions */}
+  <div style={styles.recentTransactions}>
+    <h3 style={styles.sectionTitle}>Recent Transactions</h3>
+    {expenses.length === 0 ? (
+      <p style={{ color: "#ccc" }}>• No Transactions!</p>
+    ) : (
+      expenses.map((exp) => (
+        <div key={exp.id} style={styles.transactionCard}>
+          <div style={styles.transactionLeft}>
+            <span style={styles.transactionIcon}>🍽️</span>
+            <div>
+              <strong>{exp.title}</strong>
+              <div style={{ fontSize: "0.85rem", color: "#888" }}>{exp.date}</div>
+            </div>
+          </div>
+
+          <div style={styles.rightSection}>
+            <span style={{ color: "orange", fontWeight: "bold" }}>₹{exp.amount}</span>
+            <button
+              onClick={() => handleAddDelete(exp.id)}
+              style={styles.deleteBtn}
+            >
+              ❌
+            </button>
+            <button
+              onClick={() => {
+                setExpenseToEdit(exp);
+                setShowEditModal(true);
+              }}
+              style={styles.editBtn}
+            >
+              ✏️
+            </button>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+
+  {/* Top Expenses */}
+  <div style={styles.topExpenses}>
+    <h3 style={styles.sectionTitle}>Top Expenses</h3>
+    <ExpenseSummary expenses={expenses} />
+  </div>
+</div>
 <div style={{ display: "flex", background: "#3b3b3b", borderRadius: "10px", marginTop: "30px"}}>
   <ExpenseSummary expenses={expenses}/>
 </div>
@@ -158,5 +178,49 @@ const styles = {
     padding: "4px 8px",
     cursor: "pointer",
   },
+  sectionWrapper: {
+  display: "flex",
+  gap: "20px",
+  marginTop: "30px",
+  flexWrap: "wrap"
+},
+recentTransactions: {
+  backgroundColor: "#2c2c2c",
+  padding: "20px",
+  borderRadius: "10px",
+  flex: 1,
+  minWidth: "350px"
+},
+topExpenses: {
+  backgroundColor: "#2c2c2c",
+  padding: "20px",
+  borderRadius: "10px",
+  flex: 1,
+  minWidth: "350px"
+},
+sectionTitle: {
+  color: "#fff",
+  marginBottom: "15px"
+},
+  transactionContainer: {
+  backgroundColor: "#2c2c2c",
+  padding: "20px",
+  borderRadius: "10px",
+  marginTop: "20px",
+},
+transactionCard: {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  backgroundColor: "#fff",
+  padding: "10px 20px",
+  marginBottom: "10px",
+  borderRadius: "8px",
+},
+rightSection: {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+}
 };
 export default App;
