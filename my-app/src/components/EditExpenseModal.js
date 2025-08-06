@@ -16,22 +16,25 @@ const EditExpenseModal = ({onClose, onUpdateExpense, expense})=> {
     }
   },[expense])
 
-  const handleSubmit = (e)=>{
-    e.preventDefault();
-    if(!title || !amount || !category || !date){
-        alert("Please fill all the field");
-        return;
-    }
+  const handleSubmit = (e) => {
+  e.preventDefault();
 
-    
+  if (!title || !amount || !category || !date) {
+    alert("Please fill all the fields");
+    return;
   }
+
   const updatedExpense = {
-        ...expense,
-        title,
-        amount: parseFloat(amount),
-        category,
-        date,
-    }
+    ...expense,
+    title,
+    amount: parseFloat(amount),
+    category,
+    date,
+  };
+
+  onUpdateExpense(updatedExpense);
+  onClose();
+};
 
     
         return (
