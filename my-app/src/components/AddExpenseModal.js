@@ -48,7 +48,7 @@ const AddExpenseModal = ({ onClose, onAddExpense, walletBalance}) => {
                       style={styles.input}
                       />
                       <input
-                        name="amount"
+                        name="price"
                         placeholder="Amount"
                         type="number"
                         value={amount}

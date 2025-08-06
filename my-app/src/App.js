@@ -6,6 +6,7 @@ import DashboardCard from "./components/Dashboard";
 import Header from "./components/Header";
 import EditExpenseModal from "./components/EditExpenseModal";
 import ExpenseSummary from "./components/ExpenseSummary";
+import AddIncomeModal from "./components/AddIncomeModal";
 
 
 function App(){
@@ -15,6 +16,7 @@ function App(){
   const [showModal, setShowModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [expenseToEdit, setExpenseToEdit] = useState(null)
+  const [showIncomeModal, setShowIncomeModal] = useState(false)
 
   useEffect(()=>{
     const storedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
@@ -31,12 +33,8 @@ function App(){
     localStorage.setItem("walletBalance", walletBalance)
   },[expenses, walletBalance])
 
-  const handleAddIncome = () => {
-    const amount = parseFloat(prompt("Enter amount to add"));
-    if (isNaN(amount) || amount <= 0) {
-      alert("Enter a valid amount");
-      return;
-    }
+  const handleAddIncome = (amount) => {
+    
     setWalletBalance(prev => prev + amount);
   };
 
@@ -74,7 +72,7 @@ function App(){
           label="Wallet Balance"
           amount={walletBalance}
           buttonLabel="+ Add Income"
-          onClick={handleAddIncome}
+          onClick={()=> setShowIncomeModal(true)}
           color="limegreen"
         />
         <DashboardCard
@@ -92,6 +90,12 @@ function App(){
           onAddExpense={handleAddExpense}
           onClose={() => setShowModal(false)}
         />
+      )}
+      {showIncomeModal && (
+        <AddIncomeModal
+          onAddIncome={handleAddIncome}
+          onClose={()=> setShowIncomeModal(false)}
+          />
       )}
       <ul>
   {expenses.length === 0 ? (
