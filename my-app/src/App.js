@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import AddExpenseModal from "./components/AddExpenseModal";
 import WalletCard from "./components/wallet";
@@ -7,61 +6,59 @@ import Header from "./components/Header";
 import EditExpenseModal from "./components/EditExpenseModal";
 import ExpenseSummary from "./components/ExpenseSummary";
 import AddIncomeModal from "./components/AddIncomeModal";
+import RecentTransactions from "./components/RecentTransaction";
 
+function App() {
+  const [expenses, setExpenses] = useState([]);
+  const [walletBalance, setWalletBalance] = useState(5000);
+  const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [expenseToEdit, setExpenseToEdit] = useState(null);
+  const [showIncomeModal, setShowIncomeModal] = useState(false);
 
-function App(){
-
-  const [expenses, setExpenses] = useState([])
-  const [walletBalance, setWalletBalance] = useState(5000)
-  const [showModal, setShowModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [expenseToEdit, setExpenseToEdit] = useState(null)
-  const [showIncomeModal, setShowIncomeModal] = useState(false)
-
-  useEffect(()=>{
+  useEffect(() => {
     const storedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
-    const storedBalance = parseFloat(localStorage.getItem("walletBalance"))
+    const storedBalance = parseFloat(localStorage.getItem("walletBalance"));
 
     setExpenses(storedExpenses);
-    if(!isNaN(storedBalance)){
-      setWalletBalance(storedBalance)
+    if (!isNaN(storedBalance)) {
+      setWalletBalance(storedBalance);
     }
-  },[])
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("expenses", JSON.stringify(expenses));
-    localStorage.setItem("walletBalance", walletBalance)
-  },[expenses, walletBalance])
+    localStorage.setItem("walletBalance", walletBalance);
+  }, [expenses, walletBalance]);
 
   const handleAddIncome = (amount) => {
-    
-    setWalletBalance(prev => prev + amount);
+    setWalletBalance((prev) => prev + amount);
   };
 
-  const handleAddExpense = (expenseData)=>{
+  const handleAddExpense = (expenseData) => {
     setExpenses((prev) => [...prev, expenseData]);
-    setWalletBalance((prev) => prev - expenseData.amount)
-  }
+    setWalletBalance((prev) => prev - expenseData.amount);
+  };
+
   const handleUpdateExpense = (updatedExpense) => {
-  setExpenses(prev => prev.map(exp => exp.id === updatedExpense.id ? updatedExpense : exp));
+    setExpenses((prev) =>
+      prev.map((exp) => (exp.id === updatedExpense.id ? updatedExpense : exp))
+    );
 
-  const oldExpense = expenses.find(e => e.id === updatedExpense.id);
-  const amountDiff = updatedExpense.amount - oldExpense.amount;
+    const oldExpense = expenses.find((e) => e.id === updatedExpense.id);
+    const amountDiff = updatedExpense.amount - oldExpense.amount;
 
-  setWalletBalance(prev => prev - amountDiff);
-};
+    setWalletBalance((prev) => prev - amountDiff);
+  };
 
-  const handleAddDelete = (id)=> {
-    const expenseToDelete = expenses.find(exp => exp.id === id);
+  const handleAddDelete = (id) => {
+    const expenseToDelete = expenses.find((exp) => exp.id === id);
 
-    if(!expenseToDelete) return;
+    if (!expenseToDelete) return;
 
-    setExpenses(prev => prev.filter(exp => exp.id !== id))
-    setWalletBalance(prev => prev + expenseToDelete.amount)
-  }
-  
-
-
+    setExpenses((prev) => prev.filter((exp) => exp.id !== id));
+    setWalletBalance((prev) => prev + expenseToDelete.amount);
+  };
 
   return (
     <div className="app-container">
@@ -72,7 +69,7 @@ function App(){
           label="Wallet Balance"
           amount={walletBalance}
           buttonLabel="+ Add Income"
-          onClick={()=> setShowIncomeModal(true)}
+          onClick={() => setShowIncomeModal(true)}
           color="limegreen"
         />
         <DashboardCard
@@ -94,71 +91,42 @@ function App(){
       {showIncomeModal && (
         <AddIncomeModal
           onAddIncome={handleAddIncome}
-          onClose={()=> setShowIncomeModal(false)}
-          />
+          onClose={() => setShowIncomeModal(false)}
+        />
       )}
+
       <div style={styles.sectionWrapper}>
-  {/* Recent Transactions */}
-  <div style={styles.recentTransactions}>
-    <h3 style={styles.sectionTitle}>Recent Transactions</h3>
-    {expenses.length === 0 ? (
-      <p style={{ color: "#ccc" }}>• No Transactions!</p>
-    ) : (
-      expenses.map((exp) => (
-        <div key={exp.id} style={styles.transactionCard}>
-          <div style={styles.transactionLeft}>
-            <span style={styles.transactionIcon}>🍽️</span>
-            <div>
-              <strong>{exp.title}</strong>
-              <div style={{ fontSize: "0.85rem", color: "#888" }}>{exp.date}</div>
-            </div>
-          </div>
-
-          <div style={styles.rightSection}>
-            <span style={{ color: "orange", fontWeight: "bold" }}>₹{exp.amount}</span>
-            <button
-              onClick={() => handleAddDelete(exp.id)}
-              style={styles.deleteBtn}
-            >
-              ❌
-            </button>
-            <button
-              onClick={() => {
-                setExpenseToEdit(exp);
-                setShowEditModal(true);
-              }}
-              style={styles.editBtn}
-            >
-              ✏️
-            </button>
-          </div>
+        {/* Recent Transactions */}
+        <div style={styles.recentTransactions}>
+          <h3 style={styles.sectionTitle}>Recent Transactions</h3>
+          <RecentTransactions
+            expenses={expenses}
+            onEdit={(exp) => {
+              setExpenseToEdit(exp);
+              setShowEditModal(true);
+            }}
+            onDelete={handleAddDelete}
+          />
         </div>
-      ))
-    )}
-  </div>
 
-  {/* Top Expenses */}
-  <div style={styles.topExpenses}>
-    <h3 style={styles.sectionTitle}>Top Expenses</h3>
-    <ExpenseSummary expenses={expenses} />
-  </div>
-</div>
-<div style={{ display: "flex", background: "#3b3b3b", borderRadius: "10px", marginTop: "30px"}}>
-  <ExpenseSummary expenses={expenses}/>
-</div>
+        {/* Top Expenses */}
+        <div style={styles.topExpenses}>
+          <h3 style={styles.sectionTitle}>Top Expenses</h3>
+          <ExpenseSummary expenses={expenses} />
+        </div>
+      </div>
 
-{showEditModal && (
-  <EditExpenseModal
-    expense={expenseToEdit}
-    onClose={() => setShowEditModal(false)}
-    onUpdateExpense={handleUpdateExpense}
-    
-  />
-)}
-    
+      {showEditModal && (
+        <EditExpenseModal
+          expense={expenseToEdit}
+          onClose={() => setShowEditModal(false)}
+          onUpdateExpense={handleUpdateExpense}
+        />
+      )}
     </div>
   );
 }
+
 const styles = {
   deleteBtn: {
     marginLeft: "10px",
@@ -179,48 +147,29 @@ const styles = {
     cursor: "pointer",
   },
   sectionWrapper: {
-  display: "flex",
-  gap: "20px",
-  marginTop: "30px",
-  flexWrap: "wrap"
-},
-recentTransactions: {
-  backgroundColor: "#2c2c2c",
-  padding: "20px",
-  borderRadius: "10px",
-  flex: 1,
-  minWidth: "350px"
-},
-topExpenses: {
-  backgroundColor: "#2c2c2c",
-  padding: "20px",
-  borderRadius: "10px",
-  flex: 1,
-  minWidth: "350px"
-},
-sectionTitle: {
-  color: "#fff",
-  marginBottom: "15px"
-},
-  transactionContainer: {
-  backgroundColor: "#2c2c2c",
-  padding: "20px",
-  borderRadius: "10px",
-  marginTop: "20px",
-},
-transactionCard: {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  backgroundColor: "#fff",
-  padding: "10px 20px",
-  marginBottom: "10px",
-  borderRadius: "8px",
-},
-rightSection: {
-  display: "flex",
-  alignItems: "center",
-  gap: "10px",
-}
+    display: "flex",
+    gap: "20px",
+    marginTop: "30px",
+    flexWrap: "wrap",
+  },
+  recentTransactions: {
+    backgroundColor: "#2c2c2c",
+    padding: "20px",
+    borderRadius: "10px",
+    flex: 1,
+    minWidth: "350px",
+  },
+  topExpenses: {
+    backgroundColor: "#2c2c2c",
+    padding: "20px",
+    borderRadius: "10px",
+    flex: 1,
+    minWidth: "350px",
+  },
+  sectionTitle: {
+    color: "#fff",
+    marginBottom: "15px",
+  },
 };
+
 export default App;
